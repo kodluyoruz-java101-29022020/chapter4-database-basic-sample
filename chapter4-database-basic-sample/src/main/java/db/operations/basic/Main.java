@@ -22,10 +22,17 @@ public class Main {
 	
 	public static void main(String[] args) {
 	
-		/*
+		// employees tablosuna bir tane yeni kayıt ekler.
+		insertEmployeeOneRecord();
+				
+				
+		// employees tablosundaki tüm kayıtları çeker
 		selectEmployees();
 		
-		insertEmployeeOneRecord();
+		// employees tablosundan 9 nolu kaydı getirir
+		Long empNo = findEmployeeId(1L);
+		System.out.println(empNo);
+		
 		
 		
 		Employee employee1 = new Employee();
@@ -57,35 +64,43 @@ public class Main {
 		employees.add(employee2);
 		employees.add(employee3);
 		
+		// employees tablosuna toplu şekilde yeni kayıtları ekler 
 		insertBulkEmployees(employees);
 		
-		Long empNo = findEmployeeId(6L);
 		
+		
+		
+		empNo = findEmployeeId(2L);
+		
+		// employees tablosunda 6 nolu kaydı günceller
 		updateOneEmployeeRecord(empNo, "Batuhan", "Düzgün");
 		
 		
+		
 		Set<Long> empNoList = new HashSet<Long>();
-		empNoList.add(findEmployeeId(4L));
-		empNoList.add(findEmployeeId(6L));
-		empNoList.add(findEmployeeId(7L));
-		
-		updateBulkEmployeeRecord(empNoList, "Same", "Same");
-		*/
-		
-		/*
-		Long empNoForDeleted = findEmployeeId(5L);
-		deleteOneEmployeeRecord(empNoForDeleted);
-		*/
-		
-		/*
-		Set<Long> empNoList = new HashSet<Long>();
+		empNoList.add(findEmployeeId(1L));
 		empNoList.add(findEmployeeId(2L));
 		empNoList.add(findEmployeeId(3L));
 		
+		// employees tablosunda toplu şekilde 1,2,3 nolu kayıtları günceller
+		updateBulkEmployeeRecord(empNoList, "Same", "Same");
+		
+		
+		// employees tablosunda 3 nolu kaydı siler
+		Long empNoForDeleted = findEmployeeId(3L);
+		deleteOneEmployeeRecord(empNoForDeleted);
+	
+		
+		
+		empNoList = new HashSet<Long>();
+		empNoList.add(findEmployeeId(1L));
+		empNoList.add(findEmployeeId(2L));
+		
+		// employees tablosunda 1,2 nolu kayıtları siler
 		deleteBulkEmployeeRecord(empNoList);
-		*/
 		
 		
+		// JDBC API ile transaction yönetimi yapılması
 		transactionManagementInJdbc();
 	}
 	
@@ -145,13 +160,17 @@ public class Main {
 			dbConnection = DriverManager.getConnection(dbHost, userName, password);
 			
 			PreparedStatement preparedStatement =
-					dbConnection.prepareStatement("SELECT emp_no FROM employees_auto_inc WHERE emp_no = ?");
+					dbConnection.prepareStatement("SELECT emp_no, first_name, last_name FROM employees_auto_inc WHERE emp_no = ? ");
 			
+			// 8
 			preparedStatement.setLong(1, empNo);
 			
 			ResultSet resultSet = preparedStatement.executeQuery();
 			
 			resultSet.first();
+			
+			System.out.println(resultSet.getString(2) + " " + resultSet.getString(3));
+			
 			return resultSet.getLong(1);
 		}
 		catch (Exception e) {
@@ -181,12 +200,14 @@ public class Main {
 			
 			PreparedStatement preparedStatement = 
 					dbConnection.prepareStatement("INSERT INTO employees_auto_inc (emp_no, first_name, last_name, gender, birth_date, hire_date) VALUES(?,?,?,?,?,?)");
+			
 			preparedStatement.setLong(1, 0);
 			preparedStatement.setString(2, "Ayşe");
 			preparedStatement.setString(3, "Kalem");
 			preparedStatement.setString(4, "F");
 			preparedStatement.setDate(5, new java.sql.Date(new Date().getTime()));
 			preparedStatement.setDate(6, new java.sql.Date(new Date().getTime()));
+			
 			int insertedRowCount = preparedStatement.executeUpdate();
 			
 			System.out.println(insertedRowCount + " record inserted!");
@@ -225,16 +246,19 @@ public class Main {
 			while(iterator.hasNext()) {
 				
 				Employee employee = iterator.next();
+				
 				preparedStatement.setLong(1, employee.getId());
 				preparedStatement.setString(2, employee.getName());
 				preparedStatement.setString(3, employee.getLastName());
 				preparedStatement.setString(4, employee.getGender());
 				preparedStatement.setDate(5, new java.sql.Date(employee.getBirthDate().getTime()));
 				preparedStatement.setDate(6, new java.sql.Date(employee.getHireDate().getTime()));
+				
 				preparedStatement.addBatch();            
 			}
 			
 			int[] effectedRows = preparedStatement.executeBatch();
+			
 			System.out.println(effectedRows.length + " rows effected in employees table!");
 		}
 		catch (Exception e) {
@@ -476,6 +500,7 @@ public class Main {
 		builder.append(" ");
 		builder.append(resultSet.getDate("hire_date"));
 		builder.append(" ");
+		
 		System.out.println(builder.toString());
 	}
 

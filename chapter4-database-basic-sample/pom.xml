@@ -5,7 +5,8 @@
   <version>0.0.1-SNAPSHOT</version>
   
   	<properties>
-		<mongodb.version>5.1.48</mongodb.version>
+		<mysql.version>5.1.48</mysql.version>
+		<mongodb.version>3.4.2</mongodb.version>
 	</properties>
 	
 	<dependencies>
@@ -13,12 +14,12 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>${mongodb.version}</version>
+			<version>${mysql.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver</artifactId>
-			<version>3.4.2</version>
+			<version>${mongodb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
